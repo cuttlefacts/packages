@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+PKGS=https://github.com/cuttlefacts/packages.git
+
+function bootstrap {
+    local origin=$(git remote get-url origin)
+    if [ -z "$origin" ]; then
+        echo "error: no git remote 'origin' found" >&2
+        exit 1
+    fi
+
+    echo "==> Getting flux-readonly package as bootstrap/" >&2
+    kpt pkg get $PKGS/flux-readonly bootstrap
+
+    echo "==> Setting bootstrap sync URL to $origin" >&2
+    kpt cfg set bootstrap git-url "$origin"
+
+    echo "==> Commit changes and pushing to origin" >&2
+    git add bootstrap
+    git commit -m "Add bootstrap sync"
+    git push origin
+
+    echo "==> Applying bootstrap sync to cluster" >&2
+    # NB a little cheat: make sure the namespace is applied first,
+    # otherwise this will fail the first time.
+    kubectl apply -f bootstrap/*-ns.yaml
+    kubectl apply -f bootstrap/
+}
+
+CMD=$1
+shift 1
+
+case "$CMD" in
+    bootstrap)
+        bootstrap
+        ;;
+esac
