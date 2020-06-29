@@ -1,0 +1,6 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: tekton-triggers
+packageMetadata:
+  shortDescription: Tekton Triggers base configuration

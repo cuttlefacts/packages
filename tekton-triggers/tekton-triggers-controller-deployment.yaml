@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/name: controller
+    app.kubernetes.io/part-of: tekton-triggers
+    app.kubernetes.io/version: v0.6.0
+    triggers.tekton.dev/release: v0.6.0
+  name: tekton-triggers-controller
+  namespace: tekton-pipelines
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/name: controller
+      app.kubernetes.io/part-of: tekton-triggers
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      labels:
+        app: tekton-triggers-controller
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/name: controller
+        app.kubernetes.io/part-of: tekton-triggers
+        app.kubernetes.io/version: v0.6.0
+        triggers.tekton.dev/release: v0.6.0
+        version: v0.6.0
+    spec:
+      containers:
+      - args:
+        - -logtostderr
+        - -stderrthreshold
+        - INFO
+        - -el-image
+        - gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.6.0@sha256:da1a2e49c2908b54b1a494d62edf2af8e4b8e50b01eacd614ca20dcf2ee1af7c
+        - -el-port
+        - "8080"
+        - -period-seconds
+        - "10"
+        - -failure-threshold
+        - "1"
+        env:
+        - name: SYSTEM_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CONFIG_LOGGING_NAME
+          value: config-logging-triggers
+        - name: CONFIG_OBSERVABILITY_NAME
+          value: config-observability-triggers
+        - name: METRICS_DOMAIN
+          value: tekton.dev/triggers
+        image: gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller:v0.6.0@sha256:35eed227a92f6f712611e04fa56f34b4ba9c6ab448a200e5d7dbae47537dc1c7
+        name: tekton-triggers-controller
+      serviceAccountName: tekton-triggers-controller

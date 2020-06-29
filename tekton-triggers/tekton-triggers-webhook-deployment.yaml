@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/name: webhook
+    app.kubernetes.io/part-of: tekton-triggers
+    app.kubernetes.io/version: v0.6.0
+    triggers.tekton.dev/release: v0.6.0
+  name: tekton-triggers-webhook
+  namespace: tekton-pipelines
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/name: webhook
+      app.kubernetes.io/part-of: tekton-triggers
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      labels:
+        app: tekton-triggers-webhook
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/name: webhook
+        app.kubernetes.io/part-of: tekton-triggers
+        app.kubernetes.io/version: v0.6.0
+        triggers.tekton.dev/release: v0.6.0
+        version: v0.6.0
+    spec:
+      containers:
+      - env:
+        - name: SYSTEM_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CONFIG_LOGGING_NAME
+          value: config-logging-triggers
+        - name: WEBHOOK_SERVICE_NAME
+          value: tekton-triggers-webhook
+        - name: WEBHOOK_SECRET_NAME
+          value: triggers-webhook-certs
+        - name: METRICS_DOMAIN
+          value: tekton.dev/triggers
+        image: gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook:v0.6.0@sha256:6ea8db45cf0ca04e14061234b47af44144d690d87c1d19c0b958ab3974f50f79
+        name: webhook
+        ports:
+        - containerPort: 9090
+          name: metrics
+        - containerPort: 8008
+          name: profiling
+        - containerPort: 8443
+          name: https-webhook
+      serviceAccountName: tekton-triggers-controller
