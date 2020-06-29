@@ -1,0 +1,37 @@
+// -*- javascript -*-
+
+// This jk script will split a YAML stream on stdin into individual
+// files, and validate them. (NB this requires an unreleased build of
+// jk, to support image imports, at present)
+//
+// How to use:
+//
+//     curl -L https://github.com/some/yaml/you/found | \
+//       jk generate --stdout --lib jkcfg/kubernetes ./split.jk
+//
+// will print everything to stdout for you to eyeball. If it looks OK,
+// choose a destination directory and:
+//
+//     curl -L https:/github.com/some/yaml/you/found | \
+//       jk generate -o dest/dir --lib jkcfg/kubernetes ./split.jk
+//
+// There may be problems with the validation (because the library
+// doens't seem to treat the CRD type correctly, see
+// https://github.com/jkcfg/kubernetes/issues/69. Switch that off with
+// `-p no-validate=true`.
+
+import { valuesForGenerate } from '@jkcfg/kubernetes/generate';
+import validate from '@jkcfg/kubernetes/validate';
+import { read, Format } from '@jkcfg/std';
+import * as param from '@jkcfg/std/param';
+
+const noValidate = param.Boolean('no-validate', false);
+
+async function splitManifests() {
+  const all = await read('', { format: Format.YAMLStream });
+  const files = await valuesForGenerate(all)
+  if (noValidate) return files;
+  return files.map(v => Object.assign(v, { validate }));
+}
+
+export default splitManifests();
