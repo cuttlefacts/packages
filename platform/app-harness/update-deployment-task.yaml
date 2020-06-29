@@ -1,0 +1,34 @@
+---
+# This is a (cluster) task that will run a jk script, given in the
+# parameter `script`, from the repo resource `scripts`. The 
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: run-jk-script
+spec:
+  params:
+  - name: script
+    description: The path within the scripts repo
+  - name: params
+    description: The path to the manifest file to update
+  resources:
+    inputs:
+    - name: scripts
+      type: git
+    - name: before
+      type: git
+    outputs:
+    - name: after
+      type git
+  steps:
+  - name: update
+    image: docker.pkg.github.com/squaremo/cuttlefacts/
+    command:
+    - jk
+    - run
+    - --input-directory=$(inputs.resources.before.path)
+    - --output-directory=$(inputs.resource.after.path)
+    - params[*]
+    - $(inputs.resources.scripts.path)/$(inputs.params.script)
+    securityContext:
+      runAsUser: 0
