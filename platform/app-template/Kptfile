@@ -1,0 +1,6 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: app-template
+packageMetadata:
+  shortDescription: Package to specialise the app pipeline for each app
