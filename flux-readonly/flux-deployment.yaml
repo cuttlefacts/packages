@@ -84,18 +84,18 @@ spec:
         # - name: kubeconfig
         #   mountPath: /etc/fluxd/kube
 
+        # Include this and the volume "gpg-keys" above, and the
+        # args below.
+        # - name: gpg-keys
+        #   mountPath: /root/gpg-import
+        #   readOnly: true
+
         # Include this to point kubectl at a different config; you
         # will need to do this if you have mounted an alternate config
         # from a configmap, as in commented blocks above.
         # env:
         # - name: KUBECONFIG
         #   value: /etc/fluxd/kube/config
-
-        # Include this and the volume "gpg-keys" above, and the
-        # args below.
-        # - name: gpg-keys
-        #   mountPath: /root/gpg-import
-        #   readOnly: true
 
         # Include this if you want to supply HTTP basic auth credentials for git
         # via the `GIT_AUTHUSER` and `GIT_AUTHKEY` environment variables using a
@@ -127,11 +127,3 @@ spec:
         # Serve /metrics endpoint at different port;
         # make sure to set prometheus' annotation to scrape the port value.
         - --listen-metrics=:3031
-
-# Optional DNS settings, configuring the ndots option may resolve
-# nslookup issues on some Kubernetes setups.
-# dnsPolicy: "None"
-# dnsConfig:
-#   options:
-#     - name: ndots
-#       value: "1"
