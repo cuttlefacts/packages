@@ -8,7 +8,7 @@
 
 // Trial run:
 //
-//     kpt fn source --function-config ./app.yaml . | jk run ./index.js
+//     kpt fn source --function-config app.yaml . | jk run ./index.js
 
 import { log, read, print, stdin, Format } from '@jkcfg/std';
 import * as resource from '@jkcfg/std/resource';
