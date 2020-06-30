@@ -6,7 +6,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: cuttlefacts/app-template:0.1
+        image: cuttlefacts/app-template:0.1.1
     fluxcd.io/ignore: "true"
   name: myapp
   namespace: myapp
