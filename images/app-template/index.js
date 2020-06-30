@@ -87,7 +87,7 @@ async function main() {
   const secretName = `${name}-git`;
   // where all the platform (app harness) things live
   const platformNS = 'platform-system';
-  const triggersSA = `${name}-serviceaccount`;
+  const triggersSA = `${name}-sa`;
   const triggersSecret = image.pushSecret;
 
   // (see the template YAMLs themselves for notes on what goes where
@@ -124,7 +124,7 @@ async function main() {
 
   sec = mergeReduce(sec, namespacedName(secretName, platformNS));
 
-  ing = mergeReduce(ing, namespacedName('ingress', namespace),
+  ing = mergeReduce(ing, namespacedName(name, namespace),
                     setPath('metadata.annotations', {
                       'nginx.ingress.kubernetes.io/rewrite-target': ingress.path,
                     }),
@@ -146,7 +146,7 @@ async function main() {
   tsa = mergeReduce(tsa, namespacedName(triggersSA, platformNS),
                     { secrets: [{ name: triggersSecret }] });
 
-  tcrb = mergeReduce(tcrb, { metadata: { name: `${name}-sa-clusterrolebinding` } }, {
+  tcrb = mergeReduce(tcrb, { metadata: { name: `${name}-sa` } }, {
     subjects: [{ kind: 'ServiceAccount', namespace: platformNS, name: triggersSA }],
   });
 
@@ -186,10 +186,20 @@ async function main() {
     },
   });
 
+  const items = [ ns, sa, rb, dep, sec, ing, tsa, tcrb, tb, el ];
+  for (const original of input.items) {
+    // NB this assumes that _if_ the function config came from here,
+    // there's only one of them.
+    if (original.kind == functionConfig.kind && original.name == functionConfig.name) {
+      items.push(original);
+      break;
+    }
+  }
+
   print({
     apiVersion: 'config.kubernetes.io/v1alpha1',
     kind: 'ResourceList',
-    items: [ ns, sa, rb, dep, sec, ing, tsa, tcrb, tb, el ],
+    items,
   }, { format: Format.YAML });
 }
 

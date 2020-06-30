@@ -8,9 +8,8 @@ app-template
 # SYNOPSIS
 
   kpt pkg get $PKGS/app-template my-app
-  kpt cfg set my-app namespace my-app
-  kpt cfg set my-app image-repo https://github.com/me/my-app-image
-  kpt cfg set my-app config-repo https://github.com/me/my-app-config
+  # edit my-app/app.yaml
+  kpt fn run my-app/
 
 # Description
 
