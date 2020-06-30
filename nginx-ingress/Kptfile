@@ -1,0 +1,6 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: nginx-ingress
+packageMetadata:
+  shortDescription: Base configuration for an Nginx-based ingress controller
