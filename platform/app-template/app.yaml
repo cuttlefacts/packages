@@ -1,0 +1,33 @@
+# This is the manifest that gives parameters for the generation
+# process.
+apiVersion: cuttlefacts/v1
+kind: App
+metadata:
+  annotations:
+    config.kubernetes.io/function: |
+      container:
+        image: cuttlefacts/app-template:0.1.1
+    fluxcd.io/ignore: "true"
+  name: myapp
+  namespace: myapp
+spec:
+  deploy:
+    # Path to the YAMLs, within the deploy git repo
+    path: deploy/
+    # HTTPS URL to the git repo with app deployment YAMLs
+    url: https://github.com/cuttlefacts/myapp.git
+  image:
+    # Path within the git repo to a Dockerfile to build
+    dockerfilePath: Dockerfile
+    # the path to the Docker build context
+    path: src/
+    # this refers to a secret to be supplied by the package user, in
+    # the platform-system namespace
+    pushSecret: myapp-push-secret
+    # the image repo
+    repo: cuttlefacts/myapp
+    # HTTPS URL to the git repo with app source code
+    url: https://github.com/cuttlefacts/myapp.git
+  ingress:
+    # URL path under which to serve the app
+    path: /myapp

@@ -4,9 +4,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  labels:
-    name: flux
-  name: flux-cuttlefacts
+  name: flux-APP
   namespace: platform-system
 ---
 # NB this must live in the app namespace, because it narrows
@@ -14,9 +12,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  labels:
-    name: flux
-    namespace: cuttlefacts
+  namespace: APP
   name: flux
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -24,20 +20,20 @@ roleRef:
   name: flux-application
 subjects:
   - kind: ServiceAccount
-    name: flux-cuttlefacts
-    namespace: policy
+    name: flux-APP
+    namespace: platform-system
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flux-cuttlefacts
-  namespace: policy
+  name: flux-APP
+  namespace: platform-system
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: flux-cuttlefacts
+      name: flux-APP
   strategy:
     type: Recreate
   template:
@@ -45,11 +41,11 @@ spec:
       annotations:
         prometheus.io/port: "3031" # tell prometheus to scrape /metrics endpoint's port.
       labels:
-        name: flux-cuttlefacts
+        name: flux-APP
     spec:
       nodeSelector:
         beta.kubernetes.io/os: linux
-      serviceAccountName: flux-cuttlefacts
+      serviceAccountName: flux-APP
 
       containers:
       - name: flux
@@ -80,12 +76,12 @@ spec:
         args:
 
         # Restrict to just the application namespace
-        - --k8s-allow-namespace=cuttlefacts
+        - --k8s-allow-namespace=APP
 
         # Replace the following URL to change the Git repository used by Flux.
         # HTTP basic auth credentials can be supplied using environment variables:
         # https://$(GIT_AUTHUSER):$(GIT_AUTHKEY)@github.com/user/repository.git
-        - --git-url=https://github.com/squaremo/cuttlefacts-app
+        - --git-url=https://github.com/cuttlefacts/APP
         - --git-branch=master
         # Include this if you want to restrict the manifests considered by flux
         # to those under the following relative paths in the git repository
@@ -103,7 +99,7 @@ spec:
 
         # We don't need the secret to hold a key, but we do want to
         # poke the HWM into an annotation
-        - --k8s-secret-name=cuttlefacts-git
+        - --k8s-secret-name=APP-git
 
         # Serve /metrics endpoint at different port;
         # make sure to set prometheus' annotation to scrape the port value.
@@ -114,6 +110,6 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: cuttlefacts-git
-  namespace: policy
+  name: APP-git
+  namespace: platform-system
 type: Opaque
