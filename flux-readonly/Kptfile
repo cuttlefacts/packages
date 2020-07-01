@@ -11,6 +11,11 @@ upstream:
     ref: master
 openAPI:
   definitions:
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: flux-system
     io.k8s.cli.setters.git-url:
       x-k8s-cli:
         setter:

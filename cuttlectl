@@ -17,6 +17,7 @@ function bootstrap {
 
     echo "==> Setting bootstrap sync URL to $origin" >&2
     kpt cfg set bootstrap git-url "$origin"
+    kpt cfg set bootstrap namespace bootstrap-system
 
     echo "==> Commit changes and pushing to origin" >&2
     git add bootstrap
