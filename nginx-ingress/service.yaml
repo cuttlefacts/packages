@@ -1,12 +1,8 @@
-# This was downloaded according to instructions in
-# https://kubernetes.github.io/ingress-nginx/deploy/#docker-for-mac,
-# and renamespaced.
----
 kind: Service
 apiVersion: v1
 metadata:
   name: ingress-nginx
-  namespace: platform-system
+  namespace: platform-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -17,11 +13,11 @@ spec:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
   ports:
-    - name: http
-      port: 80
-      protocol: TCP
-      targetPort: http
-    - name: https
-      port: 443
-      protocol: TCP
-      targetPort: https
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https

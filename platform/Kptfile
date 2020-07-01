@@ -1,9 +1,9 @@
 apiVersion: kpt.dev/v1alpha1
 kind: Kptfile
 metadata:
-  name: nginx-ingress
+  name: platform
 packageMetadata:
-  shortDescription: An Nginx-based ingress controller
+  shortDescription: base resources for a cluster platform
 openAPI:
   definitions:
     io.k8s.cli.setters.namespace:
