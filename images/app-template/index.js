@@ -126,14 +126,17 @@ async function main() {
 
   ing = mergeReduce(ing, namespacedName(name, namespace),
                     setPath('metadata.annotations', {
-                      'nginx.ingress.kubernetes.io/rewrite-target': ingress.path,
+                      // this annotation tells the nginx ingress to
+                      // rewrite the path requested, to the capture
+                      // group used for the backend path
+                      'nginx.ingress.kubernetes.io/rewrite-target': '/$2',
                     }),
                     // these things are a pain
                     setPath('spec.rules', [{
                       http: {
                         paths: [
                           {
-                            path: '/', // path at the service
+                            path: `/${ingress.prefix}(/|$)(.*)`, // path at the service, see comment on annotation above
                             backend: {
                               serviceName: ingress.serviceName,
                               servicePort: ingress.servicePort,

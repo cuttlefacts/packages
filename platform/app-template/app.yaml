@@ -6,7 +6,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: cuttlefacts/app-template:0.1.2
+        image: cuttlefacts/app-template:0.1.3
     fluxcd.io/ignore: "true"
   name: myapp
   namespace: myapp
@@ -29,8 +29,9 @@ spec:
     # HTTPS URL to the git repo with app source code
     url: https://github.com/cuttlefacts/myapp.git
   ingress:
-    # URL path under which to serve the app
-    path: /myapp
+    # URL path under which to serve the app; must start with '/' but
+    # not end with it (it gets interpolated into a pattern)
+    prefix: /myapp
     # name of the service to forward requests to
     serviceName: service
     # port on the service to forward requests to
