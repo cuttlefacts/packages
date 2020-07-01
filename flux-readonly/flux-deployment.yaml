@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flux
-  namespace: flux-system
+  namespace: flux-system # {"$kpt-set":"namespace"}
 spec:
   replicas: 1
   selector:
@@ -104,14 +104,14 @@ spec:
         # - secretRef:
         #     name: flux-git-auth
         args:
+        # Switch registry scanning off and make the git access
+        # readonly, effectively disabling automation entirely
+        - --registry-disable-scanning
         # If you deployed memcached in a different namespace to flux,
         # or with a different service name, you can supply these
         # following two arguments to tell fluxd how to connect to it.
         # - --memcached-hostname=memcached.default.svc.cluster.local
 
-        # Switch registry scanning off and make the git access
-        # readonly, effectively disabling automation entirely
-        - --registry-disable-scanning
         - --git-readonly
         # Replace the following URL to change the Git repository used by Flux.
         # HTTP basic auth credentials can be supplied using environment variables:
