@@ -135,8 +135,8 @@ async function main() {
                           {
                             path: '/', // path at the service
                             backend: {
-                              serviceName: name, // by convention
-                              servicePort: 8080,
+                              serviceName: ingress.serviceName,
+                              servicePort: ingress.servicePort,
                             },
                           },
                         ],

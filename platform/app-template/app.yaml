@@ -6,7 +6,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: cuttlefacts/app-template:0.1.1
+        image: cuttlefacts/app-template:0.1.2
     fluxcd.io/ignore: "true"
   name: myapp
   namespace: myapp
@@ -31,3 +31,8 @@ spec:
   ingress:
     # URL path under which to serve the app
     path: /myapp
+    # name of the service to forward requests to
+    serviceName: service
+    # port on the service to forward requests to
+    servicePort: 8080
+

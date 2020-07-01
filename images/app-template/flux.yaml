@@ -56,8 +56,8 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 50m
-            memory: 64Mi
+            cpu: 100m
+            memory: 90Mi
         ports:
         - containerPort: 3030 # informational
         livenessProbe:
