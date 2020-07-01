@@ -15,6 +15,9 @@ import * as resource from '@jkcfg/std/resource';
 import { stringify } from '@jkcfg/std';
 import { merge } from '@jkcfg/std/merge';
 
+// where all the build pipelines and app fluxes live
+const platformNS = 'platform-system';
+
 const flatten = Array.prototype.concat.bind([]);
 const readYAMLs = f => resource.read(f, { format: Format.YAMLStream });
 
@@ -51,6 +54,10 @@ function setPath(p, v) {
   return obj;
 }
 
+const namespacedName = (name, namespace) => ({
+  metadata: { name, namespace },
+});
+
 async function main() {
   // we get a ResourceList
   const input = await read(stdin, { format: Format.YAML });
@@ -58,42 +65,37 @@ async function main() {
   // config is in the field functionConfig
   const { functionConfig } = input;
 
+  switch (functionConfig.kind) {
+  case 'AppDeploy':
+    return deploy(input, functionConfig);
+  case 'AppBuild':
+    return build(input, functionConfig);
+  default:
+    print(input, { format: Format.YAML });
+  }
+}
+
+async function deploy(input, functionConfig) {
   const {
     metadata: { name, namespace },
-    spec: { ingress, deploy, image },
+    spec: { deploy, ingress },
   } = functionConfig;
 
   const files = await Promise.all([
     'namespace.yaml',
     'flux.yaml',
     'ingress.yaml',
-    'triggers-serviceaccount.yaml',
-    'triggers-clusterrolebinding.yaml',
-    'triggers.yaml',
   ].map(readYAMLs));
-  // this is sensitive to how the resources are grouped into the
-  // files; it would be better to either put one resource per file, or
-  // to select from all the resources by name, once read.
-  let [ ns, sa, rb, dep, sec, ing, tsa, tcrb, tb, el ] = flatten(...files);
 
-  // modifications for each resource
-
-  const namespacedName = (name, namespace) => ({
-    metadata: { name, namespace },
-  });
+  let [ns, sa, rb, dep, sec, ing] = flatten(...files);
 
   // this gets used as a name, a lot
   const fluxName = `flux-${name}`;
   const secretName = `${name}-git`;
-  // where all the platform (app harness) things live
-  const platformNS = 'platform-system';
-  const triggersSA = `${name}-sa`;
-  const triggersSecret = image.pushSecret;
 
   // (see the template YAMLs themselves for notes on what goes where
   // and why)
   ns = mergeReduce(ns, { metadata: { name: namespace } });
-
   sa = mergeReduce(sa, namespacedName(fluxName, platformNS));
 
   rb = mergeReduce(rb, namespacedName('flux', name), {
@@ -146,6 +148,42 @@ async function main() {
                       },
                     }]));
 
+  const items = [ ns, sa, rb, dep, sec, ing ];
+  for (const original of input.items) {
+    // NB this assumes that _if_ the function config came from here,
+    // there's only one of them.
+    if (original.kind == functionConfig.kind && original.name == functionConfig.name) {
+      items.push(original);
+      break;
+    }
+  }
+
+  print({
+    apiVersion: 'config.kubernetes.io/v1alpha1',
+    kind: 'ResourceList',
+    items,
+  }, { format: Format.YAML });
+}
+
+async function build(input, functionConfig) {
+  const {
+    metadata: { name, namespace },
+    spec: { image },
+  } = functionConfig;
+
+  const files = await Promise.all([
+    'triggers-serviceaccount.yaml',
+    'triggers-clusterrolebinding.yaml',
+    'triggers.yaml',
+  ].map(readYAMLs));
+  // this is sensitive to how the resources are grouped into the
+  // files; it would be better to either put one resource per file, or
+  // to select from all the resources by name, once read.
+  let [ tsa, tcrb, tb, el ] = flatten(...files);
+
+  const triggersSA = `${name}-sa`;
+  const triggersSecret = image.pushSecret;
+
   tsa = mergeReduce(tsa, namespacedName(triggersSA, platformNS),
                     { secrets: [{ name: triggersSecret }] });
 
@@ -189,7 +227,7 @@ async function main() {
     },
   });
 
-  const items = [ ns, sa, rb, dep, sec, ing, tsa, tcrb, tb, el ];
+  const items = [ tsa, tcrb, tb, el ];
   for (const original of input.items) {
     // NB this assumes that _if_ the function config came from here,
     // there's only one of them.
