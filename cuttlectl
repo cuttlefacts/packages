@@ -13,7 +13,7 @@ function bootstrap {
     fi
 
     echo "==> Getting flux-readonly package as bootstrap/" >&2
-    kpt pkg get $PKGS/flux-readonly bootstrap
+    kpt pkg get $PKGS/flux-readonly@17eb975 bootstrap
 
     echo "==> Setting bootstrap sync URL to $origin" >&2
     kpt cfg set bootstrap git-url "$origin"
