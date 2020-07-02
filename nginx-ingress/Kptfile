@@ -10,4 +10,5 @@ openAPI:
       x-k8s-cli:
         setter:
           name: namespace
-          value: platform-system
+          value: nginx-system
+          setBy: package-default

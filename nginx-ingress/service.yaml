@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: ingress-nginx
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx

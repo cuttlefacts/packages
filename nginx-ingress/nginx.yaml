@@ -2,7 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: nginx-configuration
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -11,7 +11,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: tcp-services
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -20,7 +20,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: udp-services
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -29,7 +29,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: nginx-ingress-serviceaccount
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -95,7 +95,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: nginx-ingress-role
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -139,7 +139,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: nginx-ingress-role-nisa-binding
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -150,7 +150,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: nginx-ingress-serviceaccount
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -166,13 +166,13 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: nginx-ingress-serviceaccount
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-ingress-controller
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -260,7 +260,7 @@ apiVersion: v1
 kind: LimitRange
 metadata:
   name: ingress-nginx
-  namespace: platform-system # {"$kpt-set":"namespace"}
+  namespace: nginx-system # {"$kpt-set":"namespace"}
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
