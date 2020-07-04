@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/version: v0.6.0
     triggers.tekton.dev/release: v0.6.0
   name: tekton-triggers-controller
-  namespace: tekton-pipelines
+  namespace: tekton-pipelines # {"$kpt-set":"namespace"}
 spec:
   replicas: 1
   selector:

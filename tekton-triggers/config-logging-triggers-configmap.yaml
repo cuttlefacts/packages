@@ -34,4 +34,4 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
   name: config-logging-triggers
-  namespace: tekton-pipelines
+  namespace: tekton-pipelines # {"$kpt-set":"namespace"}

@@ -11,7 +11,7 @@ metadata:
     triggers.tekton.dev/release: v0.6.0
     version: v0.6.0
   name: tekton-triggers-webhook
-  namespace: tekton-pipelines
+  namespace: tekton-pipelines # {"$kpt-set":"namespace"}
 spec:
   ports:
   - name: https-webhook

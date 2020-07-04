@@ -4,3 +4,11 @@ metadata:
   name: tekton-triggers
 packageMetadata:
   shortDescription: Tekton Triggers base configuration
+openAPI:
+  definitions:
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: tekton-pipelines
+          setBy: package-default
