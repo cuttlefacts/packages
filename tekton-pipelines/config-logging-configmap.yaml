@@ -33,4 +33,4 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
   name: config-logging
-  namespace: tekton-pipelines
+  namespace: tekton-pipelines # {"$kpt-set":"namespace"}

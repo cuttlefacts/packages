@@ -11,7 +11,7 @@ metadata:
     pipeline.tekton.dev/release: v0.13.2
     version: v0.13.2
   name: tekton-pipelines-webhook
-  namespace: tekton-pipelines
+  namespace: tekton-pipelines # {"$kpt-set":"namespace"}
 spec:
   ports:
   - name: http-metrics
