@@ -255,18 +255,3 @@ spec:
             exec:
               command:
               - /wait-shutdown
----
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: ingress-nginx
-  namespace: nginx-system # {"$kpt-set":"namespace"}
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  limits:
-  - min:
-      memory: 90Mi
-      cpu: 100m
-    type: Container
