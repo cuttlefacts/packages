@@ -6,7 +6,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: cuttlefacts/app-template:0.2.0
+        image: cuttlefacts/app-template:0.2.1
     fluxcd.io/ignore: true
   name: myapp
   namespace: myapp
@@ -23,4 +23,5 @@ spec:
     repo: cuttlefacts/myapp
     # HTTPS URL to the git repo with app source code
     url: https://github.com/cuttlefacts/myapp.git
-
+  hooks:
+    githubSharedKey: myapp-github-key
