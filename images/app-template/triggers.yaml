@@ -4,7 +4,7 @@
 ---
 # These bindings hardcode some of the fields that we (mostly) do not
 # want to take from the payload
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: APP-push-binding
@@ -22,7 +22,7 @@ spec:
   - name: serviceaccount
     value: APP-serviceaccount
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: APP-merge-listener
@@ -31,18 +31,18 @@ spec:
   serviceType: ClusterIP
   serviceAccountName: APP-serviceaccount # somewhat arbitrarily
   triggers:
-    - name: master-merge
-      interceptors:
-      - github:
-          secretRef:
-            secretName: APP-github-secret
-            secretKey: key
-          eventTypes:
+  - name: master-merge
+    interceptors:
+    - github:
+        secretRef:
+          secretName: APP-github-secret
+          secretKey: key
+        eventTypes:
           - push
-      - cel:
-          filter: "body.ref == 'refs/heads/master'"
-      bindings:
-      - name: github-push-binding
-      - name: APP-push-binding
-      template:
-        name: build-image-template
+    - cel:
+        filter: "body.ref == 'refs/heads/master'"
+    bindings:
+    - ref: github-push-binding
+    - ref: APP-push-binding
+    template:
+      name: build-image-template

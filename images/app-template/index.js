@@ -168,21 +168,24 @@ async function deploy(input, functionConfig) {
 async function build(input, functionConfig) {
   const {
     metadata: { name, namespace },
-    spec: { image },
+    spec: { image, hooks },
   } = functionConfig;
 
   const files = await Promise.all([
     'triggers-serviceaccount.yaml',
     'triggers-clusterrolebinding.yaml',
     'triggers.yaml',
+    'hook-ingress.yaml',
   ].map(readYAMLs));
   // this is sensitive to how the resources are grouped into the
   // files; it would be better to either put one resource per file, or
   // to select from all the resources by name, once read.
-  let [ tsa, tcrb, tb, el ] = flatten(...files);
+  let [ tsa, tcrb, tb, el, ing ] = flatten(...files);
 
   const triggersSA = `${name}-sa`;
   const triggersSecret = image.pushSecret;
+  const bindingName = `${name}-push-binding`;
+  const eventListenerName = `${name}-merge-listener`;
 
   tsa = mergeReduce(tsa, namespacedName(triggersSA, platformNS),
                     { secrets: [{ name: triggersSecret }] });
@@ -191,7 +194,7 @@ async function build(input, functionConfig) {
     subjects: [{ kind: 'ServiceAccount', namespace: platformNS, name: triggersSA }],
   });
 
-  tb = mergeReduce(tb, namespacedName(`${name}-push-binding`, platformNS), {
+  tb = mergeReduce(tb, namespacedName(bindingName, platformNS), {
     spec: {
       params: [
         { name: 'gitrepositoryurl', value: image.url },
@@ -203,6 +206,21 @@ async function build(input, functionConfig) {
     },
   });
 
+  ing = mergeReduce(ing, namespacedName('ingress-hook', platformNS),
+                    setPath('spec.rules', [{
+                      http: {
+                        paths: [
+                          {
+                            path: `/hook/github/${name}`,
+                            backend: {
+                              serviceName: eventListenerName,
+                              servicePort: 8080,
+                            },
+                          },
+                        ],
+                      },
+                    }]));
+
   const triggers = merge(el.spec.triggers, [{
     name: 'master-merge',
     interceptors: [{
@@ -213,8 +231,8 @@ async function build(input, functionConfig) {
       },
     }],
     bindings: [
-      { name: 'github-push-binding' }, // defined in app-harness
-      { name: tb.metadata.name }, // i.e., defined just above
+      { ref: 'github-push-binding' }, // defined in app-harness
+      { ref: bindingName }, // defined just above
     ],
   }], each({
     interceptors: each(),
@@ -227,7 +245,7 @@ async function build(input, functionConfig) {
     },
   });
 
-  const items = [ tsa, tcrb, tb, el ];
+  const items = [ tsa, tcrb, tb, el, ing ];
   for (const original of input.items) {
     // NB this assumes that _if_ the function config came from here,
     // there's only one of them.
