@@ -1,4 +1,3 @@
----
 # This is bindings from a GitHub push webhook payload to a field
 # required for the template below. This is adapted from an example
 # given at
@@ -12,7 +11,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: github-push-binding
-  namespace: policy
+  namespace: policy # {"$kpt-set":"namespace"}
 spec:
   params:
   - name: gitref
@@ -27,7 +26,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: build-image-template
-  namespace: policy
+  namespace: policy # {"$kpt-set":"namespace"}
 spec:
   params:
   - name: gitrevision
