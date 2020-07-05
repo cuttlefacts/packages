@@ -1,0 +1,36 @@
+# This runs an ngrok container, so that I can tunnel webhooks through
+# to the event listeners.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ngrok
+  namespace: platform
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      name: ngrok
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: ngrok
+      annotations:
+        prometheus.io.port: "8080"
+    spec:
+      containers:
+      - name: ngrok
+        imagePullPolicy: IfNotPresent
+        image: wernight/ngrok
+        args:
+        - ngrok
+        - http
+        - -log-level=info
+        - ingress-nginx.platform-system.svc.cluster.local:80
+        ports:
+        - containerPort: 4040
+          name: ngrok
