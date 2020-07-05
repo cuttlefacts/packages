@@ -7,7 +7,7 @@
 # webhook payload -- what if it was injected somehow? So we just take
 # the revision (suspect, but much less so), and let the URL be
 # supplied elsewhere.
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
   name: github-push-binding
@@ -22,7 +22,7 @@ spec:
 # This is a template for driving the image build task at a particular
 # revision. This is adapted from an example given at
 # https://github.com/tektoncd/triggers/blob/master/docs/triggertemplates.md
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: build-image-template
