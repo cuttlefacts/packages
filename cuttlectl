@@ -17,6 +17,9 @@ function usage {
     echo >&2
     echo "cuttlectl expand <dir>" >&2
     echo "  run the function specified in <dir> to generate YAMLs" >&2
+    echo >&2
+    echo "cuttlectl sync"
+    echo "  ask the sync to pull from origin and apply" >&2
 }
 
 function bootstrap {
@@ -68,6 +71,11 @@ function expand {
     echo "    git add $dir && git commit" >&2
 }
 
+function sync {
+    # cuttlectl sync
+    fluxctl --k8s-fwd-ns bootstrap-system sync
+}
+
 CMD=$1
 shift 1
 
@@ -80,6 +88,9 @@ case "$CMD" in
         ;;
     expand)
         expand "$1"
+        ;;
+    sync)
+        sync
         ;;
     *)
         usage
