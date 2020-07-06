@@ -1,0 +1,17 @@
+---
+# Rule for incoming webhooks
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-hook
+  namespace: PLATFORM
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /hook/github/APP
+        backend:
+          serviceName: APP-merge-listener
+          servicePort: 8080
