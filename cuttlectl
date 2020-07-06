@@ -5,6 +5,20 @@ set -o pipefail
 
 PKGS=https://github.com/cuttlefacts/packages.git
 
+function usage {
+    echo "Usage:" >&2
+    echo "cuttlectl bootstrap" >&2
+    echo "  bootstrap a cluster by installing a sync to the" >&2
+    echo "  git origin of the working directory." >&2
+    echo >&2
+    echo "cuttlectl install <pkg> <dir>" >&2
+    echo "  install the package <pkg> into the directory <dir>," >&2
+    echo "  and add to the git index, ready to commit". >&2
+    echo >&2
+    echo "cuttlectl expand <dir>" >&2
+    echo "  run the function specified in <dir> to generate YAMLs" >&2
+}
+
 function bootstrap {
     local origin=$(git remote get-url origin)
     if [ -z "$origin" ]; then
@@ -31,11 +45,43 @@ function bootstrap {
     kubectl apply -f bootstrap/
 }
 
+function install {
+    # cuttlectl install <package> <dir>
+    local pkg="$1"
+    local dir="$2"
+    echo "=> Fetching package into $dir" >&2
+    kpt pkg get "$PKGS/$pkg" "$dir"
+    echo >&2
+    echo "Done. Next you may want to:" >&2
+    echo >&2
+    echo "    git add $dir && git commit" >&2
+}
+
+function expand {
+    # cuttlectl expand <dir>
+    local dir="$1"
+    echo "==> Expanding package in $dir" >&2
+    kpt fn run "$dir"
+    echo >&2
+    echo "Done. Next you may want to:" >&2
+    echo >&2
+    echo "    git add $dir && git commit" >&2
+}
+
 CMD=$1
 shift 1
 
 case "$CMD" in
     bootstrap)
         bootstrap
+        ;;
+    install)
+        install "$1" "$2"
+        ;;
+    expand)
+        expand "$1"
+        ;;
+    *)
+        usage
         ;;
 esac
