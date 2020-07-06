@@ -138,7 +138,7 @@ async function deploy(input, functionConfig) {
                       http: {
                         paths: [
                           {
-                            path: `/${ingress.prefix}(/|$)(.*)`, // path at the service, see comment on annotation above
+                            path: `${ingress.prefix}(/|$)(.*)`, // path at the service, see comment on annotation above
                             backend: {
                               serviceName: ingress.serviceName,
                               servicePort: ingress.servicePort,
